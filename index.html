@@ -116,7 +116,7 @@
       <label>Manager Slack ID:</label>
       <input type="text" id="managerInput" placeholder="Your manager's Slack member ID" value="YOUR-MANAGER-SLACK-ID">
     </div>
-    <span class="config-hint">💬 Slack DM fires on every task check · click the toast link to send</span>
+    <span class="config-hint">💬 Click the toast or Notify button to open the Slack Workflow</span>
   </div>
 
   <!-- Progress -->
@@ -206,7 +206,7 @@ function showToast(taskLabel, sectionTitle) {
   const el   = document.createElement('div');
   el.className = 'toast';
   el.innerHTML = `<div class="toast-from">💬 Slack → ${getManager()}</div>
-    <div class="toast-msg">✅ <strong>${getName()}</strong> completed<br>"${taskLabel}"<br>${sectionTitle} · ${done}/${TOTAL} (${pct}%)<br><a href="#" onclick="openSlackDM('${taskLabel}','${sectionTitle}',${done},${pct});return false;" style="color:#76B900;font-weight:700;">→ Send Slack DM now</a></div>`;
+    <div class="toast-msg">✅ <strong>${getName()}</strong> completed<br>"${taskLabel}"<br>${sectionTitle} · ${done}/${TOTAL} (${pct}%)<br><a href="#" onclick="openSlackDM('${taskLabel}','${sectionTitle}',${done},${pct});return false;" style="color:#76B900;font-weight:700;">→ Open Slack Workflow</a></div>`;
   wrap.appendChild(el);
   setTimeout(() => {
     el.style.transition = 'opacity 0.4s';
@@ -223,15 +223,8 @@ function openSlackDM(taskLabel, sectionTitle, done, pct) {
   const msg = encodeURIComponent(
     `✅ ${name} completed "${taskLabel}" (${sectionTitle}) — ${done}/${TOTAL} tasks (${pct}% overall)`
   );
-  // Try desktop app first
-  const deepLink = `slack://user?team=YOUR-TEAM-ID&id=${managerId}`;
-  window.open(deepLink, '_blank');
-
-  // Fallback: open slack.com DM in browser after short delay
-  setTimeout(() => {
-    const webLink = `https://slack.com/app_redirect?channel=${managerId}`;
-    window.open(webLink, '_blank');
-  }, 1500);
+  // Open Slack Workflow
+  window.open('https://slack.com/shortcuts/Ft0B88R2RV44/9370c466951d616241fb50e9e92d782a', '_blank');
 }
 
 // Progress
@@ -338,14 +331,8 @@ function sendNotify(sectionId) {
   const msgLines = section.tasks.map(t => (checked[t.id] ? '✅' : '☐') + ' ' + t.label).join('%0A');
   const msgText  = `✅ ${name} completed section: *${section.title}* (${doneTasks}/${section.tasks.length} tasks)%0A%0A${msgLines}%0A%0AOverall progress: ${totalDone}/${TOTAL} (${pct}%)`;
 
-  // Open Slack desktop app DM to manager
-  const deepLink = `slack://user?team=YOUR-TEAM-ID&id=${managerId}`;
-  window.open(deepLink, '_blank');
-
-  // Fallback: Slack web DM after 1.5s
-  setTimeout(() => {
-    window.open(`https://slack.com/app_redirect?channel=${managerId}`, '_blank');
-  }, 1500);
+  // Open Slack Workflow
+  window.open('https://slack.com/shortcuts/Ft0B88R2RV44/9370c466951d616241fb50e9e92d782a', '_blank');
 
   if (btn) {
     btn.textContent = '✅ Opened!';
