@@ -15,7 +15,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
 .hsub{font-size:13px;color:rgba(255,255,255,0.6)}
 .config{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,0.08);border:1px solid #e8e8e8}
 .cg{display:flex;align-items:center;gap:6px}
-.cg label{font-size:12px;color:#666;white-space:nowrap} 
+.cg label{font-size:12px;color:#666;white-space:nowrap}
 .cg input{padding:5px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;width:170px;outline:none}
 .cg input:focus{border-color:#76B900}
 .chint{font-size:11px;color:#aaa;margin-left:auto}
@@ -90,7 +90,15 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
     <div class="sdots" id="sd"></div>
     <div class="cbanner" id="cb2">🎉 Onboarding complete! Welcome to the SCM team.</div>
   </div>
-  <div id="sections"></div>
+  <div id="save-bar" style="background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
+  <div style="flex:1;min-width:200px;">
+    <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:2px;">Your progress is saved automatically</div>
+    <div id="save-status" style="font-size:11px;color:#aaa;">Not saved yet — start checking off tasks to save your progress</div>
+  </div>
+  <button id="save-btn" onclick="saveProgress()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#333;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;">💾 Save & Continue Later</button>
+  <button onclick="clearProgress()" style="padding:8px 12px;background:transparent;color:#bbb;border:1px solid #e0e0e0;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.2s;" title="Reset all progress">↺ Reset</button>
+</div>
+<div id="sections"></div>
   <div class="footer">💡 <strong>For managers:</strong> Each new hire should have their own copy. Suggested check-ins: after Access Requests (Day 2) · after Training Topics (Week 2) · after first solo hotseat shift (Week 4+).</div>
 </div>
 <script>
@@ -103,7 +111,7 @@ const SECTIONS=[
     {id:"gerrit",label:"Request Gerrit / Git access",detail:"Request access to Gerrit and GitLab-master via your manager or the SCM Access Lists page.",link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755",linkText:"SCM Access Lists"},
     {id:"gitlab",label:"Request GitLab access",detail:"Get added to the hwinf-scm GitLab group by your manager or squad lead.",link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755",linkText:"Getting Started Guide"},
     {id:"slackch",label:"Join SCM Slack channels",detail:"Join #hwinf-scm-tm (internal), #hwinf-scm-support, #hwinf-scm-gitlab, #hwinf-scm-gitrepnv2.",link:"https://nvidia.slack.com/archives/C7527SP1V",linkText:"#hwinf-scm-tm"},
-    {id:"dl",label:"Join SCM distribution lists",detail:"Ask your manager to add you to the relevant email DL groups.",link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755/SCM+Team+New+Hire+Getting+Started+Guide#Distribution-Lists",linkText:"Getting Started Guide"}
+    {id:"dl",label:"Join SCM distribution lists",detail:"Ask your manager to add you to the relevant email DL groups.",link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755",linkText:"Getting Started Guide"}
   ]},
   {id:"team",title:"Meet the Team",emoji:"👋",color:"#6644cc",bg:"#f5f0ff",border:"#c5b8f0",
    goal:"Getting connected early makes everything easier. Introduce yourself in Week 1.",
@@ -247,7 +255,74 @@ function render(){
     cont.appendChild(div);
   });
 }
-render();updateProgress();
+render();
+
+// Load saved progress from localStorage
+function loadProgress(){
+  try {
+    const saved = localStorage.getItem('scm-onboarding-progress');
+    if(!saved) return;
+    const data = JSON.parse(saved);
+    if(data.name) document.getElementById('nameInput').value = data.name;
+    if(data.checked){
+      Object.keys(data.checked).forEach(tid => {
+        if(data.checked[tid]){
+          // Find which section this task belongs to
+          const sec = SECTIONS.find(s => s.tasks.find(t => t.id === tid));
+          if(sec){
+            checked[tid] = true;
+            const te = document.getElementById('t-'+tid);
+            const cb = document.getElementById('cb-'+tid);
+            if(te) te.classList.add('done');
+            if(cb){ cb.style.background=sec.color; cb.style.borderColor=sec.color; cb.textContent='✓'; }
+          }
+        }
+      });
+      SECTIONS.forEach(s => updateSec(s.id));
+      updateProgress();
+    }
+    if(data.saved){
+      const d = new Date(data.saved);
+      document.getElementById('save-status').textContent = 'Last saved: ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('save-status').style.color = '#76B900';
+    }
+  } catch(e){}
+}
+
+function saveProgress(){
+  try {
+    const data = {
+      name: document.getElementById('nameInput').value,
+      checked: {...checked},
+      saved: new Date().toISOString()
+    };
+    localStorage.setItem('scm-onboarding-progress', JSON.stringify(data));
+    const btn = document.getElementById('save-btn');
+    const status = document.getElementById('save-status');
+    btn.textContent = '✅ Saved!';
+    btn.style.background = '#76B900';
+    status.textContent = 'Saved at ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    status.style.color = '#76B900';
+    setTimeout(()=>{ btn.textContent = '💾 Save & Continue Later'; btn.style.background = '#333'; }, 2000);
+  } catch(e){}
+}
+
+function clearProgress(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    localStorage.removeItem('scm-onboarding-progress');
+    location.reload();
+  }
+}
+
+// Auto-save on every checkbox tick
+const _origToggle = toggleTask;
+window.toggleTask = function(tid, sid){
+  _origToggle(tid, sid);
+  saveProgress();
+};
+
+loadProgress();
+updateProgress();
 </script>
 </body>
 </html>
