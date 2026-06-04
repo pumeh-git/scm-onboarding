@@ -258,6 +258,16 @@ function toggleTask(taskId, sectionId) {
     cbEl.style.borderColor = section.color;
     cbEl.textContent = '✓';
     showToast(task.label, section.title);
+    // Silent background Slack ping on each task
+    const done2 = getCompleted();
+    const pct2  = Math.round(done2 / TOTAL * 100);
+    fetch('https://scm-onboarding-notifier.pnumeh.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'payload=' + encodeURIComponent(JSON.stringify({
+        text: `☑️ *${getName()}* checked off "${task.label}" (${section.title}) — ${done2}/${TOTAL} tasks (${pct2}%)`
+      }))
+    }).catch(() => {});
   } else {
     taskEl.classList.remove('done');
     cbEl.style.background  = '#fff';
