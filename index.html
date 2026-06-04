@@ -18,6 +18,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
 .cg label{font-size:12px;color:#666;white-space:nowrap}
 .cg input{padding:5px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;width:170px;outline:none}
 .cg input:focus{border-color:#76B900}
+.cg input.missing{border-color:#e05050;background:#fff5f5}
 .chint{font-size:11px;color:#aaa;margin-left:auto}
 .pcrd{background:#fff;border-radius:10px;padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border:1px solid #e8e8e8}
 .pmeta{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:8px}
@@ -81,7 +82,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
   </div>
   <div class="config">
     <div class="cg"><label>Your name:</label><input type="text" id="nameInput" placeholder="e.g. Jane Smith"></div>
-    <div class="cg"><label>Manager Slack ID:</label><input type="text" id="managerInput" placeholder="e.g. U08ABC1234" value="U09MQ3ER1FF"></div>
+    <div class="cg"><label>Manager Slack ID:</label><input type="text" id="managerInput" placeholder="e.g. U08ABC1234"></div>
     <span class="chint">💬 Slack notification fires on every task and section</span>
   </div>
   <div class="pcrd">
@@ -151,7 +152,23 @@ const checked={},detailOpen={},secOpen={};
 SECTIONS.forEach(s=>{secOpen[s.id]=true});
 
 const getName=()=>document.getElementById('nameInput').value.trim()||'New Hire';
+const getManager=()=>{
+  const v=document.getElementById('managerInput').value.trim();
+  return v||null;
+};
+const managerMention=()=>{
+  const m=getManager();
+  return m?'<@'+m+'>':'your manager';
+};
 const getDone=()=>Object.values(checked).filter(Boolean).length;
+
+function validateManager(){
+  const input=document.getElementById('managerInput');
+  const v=input.value.trim();
+  if(!v){input.classList.add('missing');return false;}
+  input.classList.remove('missing');
+  return true;
+}
 
 function post(text){
   fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}).catch(()=>{});
@@ -172,7 +189,7 @@ function updateProgress(){
   document.getElementById('pf').style.background=p===100?'#76B900':'linear-gradient(90deg,#76B900,#a3e635)';
   document.getElementById('pl').textContent=d+' / '+TOTAL+' tasks ('+p+'%)';
   document.getElementById('cb2').style.display=p===100?'block':'none';
-  if(p===100) post('Onboarding complete! '+getName()+' finished all 20 tasks.');
+  if(p===100) post('Onboarding complete! '+getName()+' finished all 20 tasks. '+managerMention()+' — your new hire is ready!');
   SECTIONS.forEach(s=>{
     const dot=document.getElementById('dot-'+s.id);
     const done=s.tasks.filter(t=>checked[t.id]).length;
@@ -187,7 +204,7 @@ function toggleTask(tid,sid){
   if(checked[tid]){
     te.classList.add('done');cb.style.background=sec.color;cb.style.borderColor=sec.color;cb.textContent='✓';
     const d=getDone(),p=Math.round(d/TOTAL*100);
-    post(getName()+' checked off "'+task.label+'" ('+sec.title+') - '+d+'/'+TOTAL+' ('+p+'%)');
+    post(getName()+' checked off "'+task.label+'" ('+sec.title+') — '+d+'/'+TOTAL+' ('+p+'%) '+managerMention());
     toast('Checked: '+task.label,sec.title);
   } else {
     te.classList.remove('done');cb.style.background='#fff';cb.style.borderColor='#ddd';cb.textContent='';
@@ -225,18 +242,23 @@ function updateSec(sid){
 }
 
 function sendNotify(sid){
+  if(!validateManager()){
+    document.getElementById('managerInput').focus();
+    return;
+  }
   const sec=SECTIONS.find(s=>s.id===sid);
   const done=sec.tasks.filter(t=>checked[t.id]).length;
   const btn=document.getElementById('nb-'+sid),name=getName();
   const total=getDone(),p=Math.round(total/TOTAL*100),last=sid==='hotseat';
   const lines=sec.tasks.map(t=>(checked[t.id]?'[x]':'[ ]')+' '+t.label).join('\n');
-  const text=(last?'Onboarding complete! ':'SCM Onboarding Update\n')+name+' completed '+sec.title+' ('+done+'/'+sec.tasks.length+' tasks)\n\n'+lines+'\n\nOverall: '+total+'/'+TOTAL+' ('+p+'%)';
+  const mgr=managerMention();
+  const text=(last?'🎉 Onboarding complete! ':'📋 SCM Onboarding Update\n')+mgr+' — '+name+' completed *'+sec.title+'* ('+done+'/'+sec.tasks.length+' tasks)\n\n'+lines+'\n\nOverall: '+total+'/'+TOTAL+' ('+p+'%)';
   if(btn){btn.textContent='Sending...';btn.className='nbtn bsent';}
   fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})})
   .then(r=>r.json()).then(data=>{
-    if(btn){btn.textContent=data.ok?'Sent!':'Try again';btn.className='nbtn bsent';setTimeout(()=>{btn.textContent='Slack';btn.className='nbtn bslack';},4000);}
+    if(btn){btn.textContent=data.ok?'Sent!':'Try again';btn.className='nbtn bsent';setTimeout(()=>{btn.textContent='💬 Slack';btn.className='nbtn bslack';},4000);}
     if(data.ok) toast('Manager notified!',sec.title);
-  }).catch(()=>{if(btn){btn.textContent='Slack';btn.className='nbtn bslack';}});
+  }).catch(()=>{if(btn){btn.textContent='💬 Slack';btn.className='nbtn bslack';}});
 }
 
 function render(){
@@ -264,10 +286,10 @@ function loadProgress(){
     if(!saved) return;
     const data = JSON.parse(saved);
     if(data.name) document.getElementById('nameInput').value = data.name;
+    if(data.manager) document.getElementById('managerInput').value = data.manager;
     if(data.checked){
       Object.keys(data.checked).forEach(tid => {
         if(data.checked[tid]){
-          // Find which section this task belongs to
           const sec = SECTIONS.find(s => s.tasks.find(t => t.id === tid));
           if(sec){
             checked[tid] = true;
@@ -293,6 +315,7 @@ function saveProgress(){
   try {
     const data = {
       name: document.getElementById('nameInput').value,
+      manager: document.getElementById('managerInput').value,
       checked: {...checked},
       saved: new Date().toISOString()
     };
