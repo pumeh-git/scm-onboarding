@@ -83,7 +83,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
   <div class="config">
     <div class="cg"><label>Your name:</label><input type="text" id="nameInput" placeholder="e.g. Jane Smith"></div>
     <div class="cg"><label>Manager Slack ID:</label><input type="text" id="managerInput" placeholder="e.g. U08ABC1234"></div>
-    <span class="chint">💬 Slack notification fires on every task and section</span>
+    <span class="chint">💬 Slack notifications go directly to your manager</span>
   </div>
   <div class="pcrd">
     <div class="pmeta"><span>Overall Progress</span><span class="ppct" id="pl">0 / 20 tasks (0%)</span></div>
@@ -92,14 +92,14 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:#f4f5f7;mi
     <div class="cbanner" id="cb2">🎉 Onboarding complete! Welcome to the SCM team.</div>
   </div>
   <div id="save-bar" style="background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,0.08);border:1px solid #e8e8e8;">
-  <div style="flex:1;min-width:200px;">
-    <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:2px;">Your progress is saved automatically</div>
-    <div id="save-status" style="font-size:11px;color:#aaa;">Not saved yet — start checking off tasks to save your progress</div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:12px;font-weight:700;color:#333;margin-bottom:2px;">Your progress is saved automatically</div>
+      <div id="save-status" style="font-size:11px;color:#aaa;">Not saved yet — start checking off tasks to save your progress</div>
+    </div>
+    <button id="save-btn" onclick="saveProgress()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#333;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;">💾 Save & Continue Later</button>
+    <button onclick="clearProgress()" style="padding:8px 12px;background:transparent;color:#bbb;border:1px solid #e0e0e0;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.2s;" title="Reset all progress">↺ Reset</button>
   </div>
-  <button id="save-btn" onclick="saveProgress()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#333;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;">💾 Save & Continue Later</button>
-  <button onclick="clearProgress()" style="padding:8px 12px;background:transparent;color:#bbb;border:1px solid #e0e0e0;border-radius:8px;font-size:11px;cursor:pointer;transition:all 0.2s;" title="Reset all progress">↺ Reset</button>
-</div>
-<div id="sections"></div>
+  <div id="sections"></div>
   <div class="footer">💡 <strong>For managers:</strong> Each new hire should have their own copy. Suggested check-ins: after Access Requests (Day 2) · after Training Topics (Week 2) · after first solo hotseat shift (Week 4+).</div>
 </div>
 <script>
@@ -152,35 +152,49 @@ const checked={},detailOpen={},secOpen={};
 SECTIONS.forEach(s=>{secOpen[s.id]=true});
 
 const getName=()=>document.getElementById('nameInput').value.trim()||'New Hire';
-const getManager=()=>{
-  const v=document.getElementById('managerInput').value.trim();
-  return v||null;
-};
-const managerMention=()=>{
-  const m=getManager();
-  return m?'<@'+m+'>':'your manager';
-};
+const getManager=()=>document.getElementById('managerInput').value.trim();
 const getDone=()=>Object.values(checked).filter(Boolean).length;
 
 function validateManager(){
   const input=document.getElementById('managerInput');
   const v=input.value.trim();
-  if(!v){input.classList.add('missing');return false;}
+  if(!v){
+    input.classList.add('missing');
+    input.focus();
+    showToastError('Enter your Manager Slack ID first (e.g. U08ABC1234)');
+    return false;
+  }
   input.classList.remove('missing');
   return true;
 }
 
+// Post to worker — always sends channel (manager ID) + text
 function post(text){
-  fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}).catch(()=>{});
+  const channel=getManager();
+  if(!channel) return; // silent skip on auto-fire if no manager set yet
+  fetch(W,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({channel, text})
+  }).catch(()=>{});
 }
 
 function toast(msg,sec){
   const d=getDone(),p=Math.round(d/TOTAL*100);
   const w=document.getElementById('tw'),el=document.createElement('div');
   el.className='toast';
-  el.innerHTML='<div class="tfrom">Slack notification sent</div><div class="tmsg">'+msg+'<br><small>'+sec+' · '+d+'/'+TOTAL+' ('+p+'%)</small></div>';
+  el.innerHTML='<div class="tfrom">✅ Slack sent to manager</div><div class="tmsg">'+msg+'<br><small>'+sec+' · '+d+'/'+TOTAL+' ('+p+'%)</small></div>';
   w.appendChild(el);
   setTimeout(()=>{el.style.transition='opacity 0.4s';el.style.opacity='0';setTimeout(()=>el.remove(),400)},4500);
+}
+
+function showToastError(msg){
+  const w=document.getElementById('tw'),el=document.createElement('div');
+  el.className='toast';
+  el.style.borderLeftColor='#e05050';
+  el.innerHTML='<div class="tfrom" style="color:#e05050">⚠️ Action needed</div><div class="tmsg">'+msg+'</div>';
+  w.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity 0.4s';el.style.opacity='0';setTimeout(()=>el.remove(),400)},4000);
 }
 
 function updateProgress(){
@@ -189,7 +203,7 @@ function updateProgress(){
   document.getElementById('pf').style.background=p===100?'#76B900':'linear-gradient(90deg,#76B900,#a3e635)';
   document.getElementById('pl').textContent=d+' / '+TOTAL+' tasks ('+p+'%)';
   document.getElementById('cb2').style.display=p===100?'block':'none';
-  if(p===100) post('Onboarding complete! '+getName()+' finished all 20 tasks. '+managerMention()+' — your new hire is ready!');
+  if(p===100) post('🎉 Onboarding complete! *'+getName()+'* finished all '+TOTAL+' tasks. Welcome to the SCM team!');
   SECTIONS.forEach(s=>{
     const dot=document.getElementById('dot-'+s.id);
     const done=s.tasks.filter(t=>checked[t.id]).length;
@@ -204,8 +218,8 @@ function toggleTask(tid,sid){
   if(checked[tid]){
     te.classList.add('done');cb.style.background=sec.color;cb.style.borderColor=sec.color;cb.textContent='✓';
     const d=getDone(),p=Math.round(d/TOTAL*100);
-    post(getName()+' checked off "'+task.label+'" ('+sec.title+') — '+d+'/'+TOTAL+' ('+p+'%) '+managerMention());
-    toast('Checked: '+task.label,sec.title);
+    post('☑️ *'+getName()+'* checked off "'+task.label+'" ('+sec.title+') — '+d+'/'+TOTAL+' ('+p+'%)');
+    toast('"'+task.label+'"',sec.title);
   } else {
     te.classList.remove('done');cb.style.background='#fff';cb.style.borderColor='#ddd';cb.textContent='';
   }
@@ -242,23 +256,33 @@ function updateSec(sid){
 }
 
 function sendNotify(sid){
-  if(!validateManager()){
-    document.getElementById('managerInput').focus();
-    return;
-  }
+  if(!validateManager()) return;
   const sec=SECTIONS.find(s=>s.id===sid);
   const done=sec.tasks.filter(t=>checked[t.id]).length;
   const btn=document.getElementById('nb-'+sid),name=getName();
   const total=getDone(),p=Math.round(total/TOTAL*100),last=sid==='hotseat';
-  const lines=sec.tasks.map(t=>(checked[t.id]?'[x]':'[ ]')+' '+t.label).join('\n');
-  const mgr=managerMention();
-  const text=(last?'🎉 Onboarding complete! ':'📋 SCM Onboarding Update\n')+mgr+' — '+name+' completed *'+sec.title+'* ('+done+'/'+sec.tasks.length+' tasks)\n\n'+lines+'\n\nOverall: '+total+'/'+TOTAL+' ('+p+'%)';
+  const lines=sec.tasks.map(t=>(checked[t.id]?'✅':'⬜')+' '+t.label).join('\n');
+  const text=(last
+    ?'🎉 *Onboarding Complete!*\n*'+name+'* has finished all sections.\n\n'+lines+'\n\nOverall: '+total+'/'+TOTAL+' ('+p+'%)'
+    :'📋 *SCM Onboarding Update*\n*'+name+'* completed *'+sec.title+'* ('+done+'/'+sec.tasks.length+' tasks)\n\n'+lines+'\n\nOverall: '+total+'/'+TOTAL+' ('+p+'%)');
   if(btn){btn.textContent='Sending...';btn.className='nbtn bsent';}
-  fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})})
+  fetch(W,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({channel:getManager(), text})
+  })
   .then(r=>r.json()).then(data=>{
-    if(btn){btn.textContent=data.ok?'Sent!':'Try again';btn.className='nbtn bsent';setTimeout(()=>{btn.textContent='💬 Slack';btn.className='nbtn bslack';},4000);}
-    if(data.ok) toast('Manager notified!',sec.title);
-  }).catch(()=>{if(btn){btn.textContent='💬 Slack';btn.className='nbtn bslack';}});
+    if(btn){
+      btn.textContent=data.ok?'✅ Sent!':'❌ Try again';
+      btn.className='nbtn bsent';
+      setTimeout(()=>{btn.textContent='💬 Slack';btn.className='nbtn bslack';},4000);
+    }
+    if(data.ok) toast('Manager notified for '+sec.title,sec.title);
+    else showToastError('Slack error: '+(data.error||'unknown'));
+  }).catch(()=>{
+    if(btn){btn.textContent='💬 Slack';btn.className='nbtn bslack';}
+    showToastError('Could not reach notification server.');
+  });
 }
 
 function render(){
@@ -279,54 +303,50 @@ function render(){
 }
 render();
 
-// Load saved progress from localStorage
 function loadProgress(){
   try {
-    const saved = localStorage.getItem('scm-onboarding-progress');
+    const saved=localStorage.getItem('scm-onboarding-progress');
     if(!saved) return;
-    const data = JSON.parse(saved);
-    if(data.name) document.getElementById('nameInput').value = data.name;
-    if(data.manager) document.getElementById('managerInput').value = data.manager;
+    const data=JSON.parse(saved);
+    if(data.name) document.getElementById('nameInput').value=data.name;
+    if(data.manager) document.getElementById('managerInput').value=data.manager;
     if(data.checked){
-      Object.keys(data.checked).forEach(tid => {
+      Object.keys(data.checked).forEach(tid=>{
         if(data.checked[tid]){
-          const sec = SECTIONS.find(s => s.tasks.find(t => t.id === tid));
+          const sec=SECTIONS.find(s=>s.tasks.find(t=>t.id===tid));
           if(sec){
-            checked[tid] = true;
-            const te = document.getElementById('t-'+tid);
-            const cb = document.getElementById('cb-'+tid);
+            checked[tid]=true;
+            const te=document.getElementById('t-'+tid),cb=document.getElementById('cb-'+tid);
             if(te) te.classList.add('done');
-            if(cb){ cb.style.background=sec.color; cb.style.borderColor=sec.color; cb.textContent='✓'; }
+            if(cb){cb.style.background=sec.color;cb.style.borderColor=sec.color;cb.textContent='✓';}
           }
         }
       });
-      SECTIONS.forEach(s => updateSec(s.id));
+      SECTIONS.forEach(s=>updateSec(s.id));
       updateProgress();
     }
     if(data.saved){
-      const d = new Date(data.saved);
-      document.getElementById('save-status').textContent = 'Last saved: ' + d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-      document.getElementById('save-status').style.color = '#76B900';
+      const d=new Date(data.saved);
+      document.getElementById('save-status').textContent='Last saved: '+d.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      document.getElementById('save-status').style.color='#76B900';
     }
   } catch(e){}
 }
 
 function saveProgress(){
   try {
-    const data = {
-      name: document.getElementById('nameInput').value,
-      manager: document.getElementById('managerInput').value,
-      checked: {...checked},
-      saved: new Date().toISOString()
+    const data={
+      name:document.getElementById('nameInput').value,
+      manager:document.getElementById('managerInput').value,
+      checked:{...checked},
+      saved:new Date().toISOString()
     };
-    localStorage.setItem('scm-onboarding-progress', JSON.stringify(data));
-    const btn = document.getElementById('save-btn');
-    const status = document.getElementById('save-status');
-    btn.textContent = '✅ Saved!';
-    btn.style.background = '#76B900';
-    status.textContent = 'Saved at ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-    status.style.color = '#76B900';
-    setTimeout(()=>{ btn.textContent = '💾 Save & Continue Later'; btn.style.background = '#333'; }, 2000);
+    localStorage.setItem('scm-onboarding-progress',JSON.stringify(data));
+    const btn=document.getElementById('save-btn'),status=document.getElementById('save-status');
+    btn.textContent='✅ Saved!';btn.style.background='#76B900';
+    status.textContent='Saved at '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    status.style.color='#76B900';
+    setTimeout(()=>{btn.textContent='💾 Save & Continue Later';btn.style.background='#333';},2000);
   } catch(e){}
 }
 
@@ -337,12 +357,8 @@ function clearProgress(){
   }
 }
 
-// Auto-save on every checkbox tick
-const _origToggle = toggleTask;
-window.toggleTask = function(tid, sid){
-  _origToggle(tid, sid);
-  saveProgress();
-};
+const _origToggle=toggleTask;
+window.toggleTask=function(tid,sid){_origToggle(tid,sid);saveProgress();};
 
 loadProgress();
 updateProgress();
