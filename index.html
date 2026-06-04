@@ -7,18 +7,14 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, 'Segoe UI', Arial, sans-serif; background: #f4f5f7; min-height: 100vh; }
-
   .app { max-width: 820px; margin: 0 auto; padding: 24px 20px; }
 
-  /* Header */
   .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); border-radius: 14px; padding: 28px 32px; margin-bottom: 20px; position: relative; overflow: hidden; }
   .header::before { content:''; position:absolute; top:-40px; right:-40px; width:200px; height:200px; background:rgba(118,185,0,0.15); border-radius:50%; }
-  .header::after  { content:''; position:absolute; bottom:-60px; right:60px; width:140px; height:140px; background:rgba(118,185,0,0.08); border-radius:50%; }
   .header-eyebrow { font-size:10px; color:#76B900; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; }
-  .header-title   { font-size:24px; font-weight:800; color:#fff; margin-bottom:6px; }
-  .header-sub     { font-size:13px; color:rgba(255,255,255,0.6); }
+  .header-title { font-size:24px; font-weight:800; color:#fff; margin-bottom:6px; }
+  .header-sub { font-size:13px; color:rgba(255,255,255,0.6); }
 
-  /* Config */
   .config { background:#fff; border-radius:10px; padding:14px 18px; margin-bottom:18px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; box-shadow:0 1px 4px rgba(0,0,0,0.08); border:1px solid #e8e8e8; }
   .config-group { display:flex; align-items:center; gap:6px; }
   .config-group label { font-size:12px; color:#666; white-space:nowrap; }
@@ -26,43 +22,34 @@
   .config-group input:focus { border-color:#76B900; }
   .config-hint { font-size:11px; color:#aaa; margin-left:auto; }
 
-  /* Progress */
   .progress-card { background:#fff; border-radius:10px; padding:16px 18px; margin-bottom:18px; box-shadow:0 1px 4px rgba(0,0,0,0.08); border:1px solid #e8e8e8; }
   .progress-meta { display:flex; justify-content:space-between; font-size:12px; color:#888; margin-bottom:8px; }
-  .progress-pct  { color:#76B900; font-weight:700; font-size:14px; }
+  .progress-pct { color:#76B900; font-weight:700; font-size:14px; }
   .progress-track { background:#eee; border-radius:99px; height:12px; overflow:hidden; margin-bottom:8px; }
-  .progress-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,#76B900,#a3e635); transition:width 0.5s ease; width:0%; }
+  .progress-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#76B900,#a3e635); transition:width 0.5s ease; width:0%; }
   .section-dots { display:flex; gap:6px; flex-wrap:wrap; }
   .section-dot { font-size:11px; padding:3px 10px; border-radius:99px; background:#f0f0f0; color:#888; font-weight:600; transition:all 0.3s; }
   .section-dot.done { background:#76B900; color:#fff; }
   .complete-banner { display:none; margin-top:10px; padding:10px 14px; background:#f0fae0; border:1px solid #b0d870; border-radius:8px; text-align:center; font-size:13px; font-weight:700; color:#3a7000; }
 
-  /* Sections */
   .section { background:#fff; border-radius:12px; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.07); border:1px solid #e8e8e8; transition:border-color 0.3s; }
   .section.all-done { border-color:#76B900; }
-
   .section-hdr { display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer; user-select:none; transition:background 0.2s; }
   .section-hdr:hover { background:#fafafa; }
   .section-emoji { font-size:20px; }
-  .section-name  { flex:1; font-weight:700; font-size:14px; color:#222; transition:color 0.2s; }
+  .section-name { flex:1; font-weight:700; font-size:14px; color:#222; transition:color 0.2s; }
   .section-count { font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; transition:all 0.2s; }
-  .done-badge    { font-size:11px; border-radius:99px; padding:3px 10px; font-weight:700; color:#fff; display:none; }
+  .done-badge { font-size:11px; border-radius:99px; padding:3px 10px; font-weight:700; color:#fff; display:none; }
   .section-chevron { font-size:11px; color:#bbb; width:14px; text-align:center; transition:transform 0.2s; }
   .section-chevron.open { transform:rotate(180deg); }
-
   .section-body { padding:10px 14px 6px; border-top:1px solid #f0f0f0; }
+  .goal-panel { border-left:3px solid #ccc; border-radius:0 6px 6px 0; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#555; line-height:1.5; background:#f8f9fa; }
 
-  /* Goal panel */
-  .goal-panel { background:#f8f9fa; border-left:3px solid #ccc; border-radius:0 6px 6px 0; padding:10px 14px; margin-bottom:12px; font-size:12px; color:#555; line-height:1.5; }
-
-  /* Tasks */
   .task { border-radius:8px; border:1px solid #ebebeb; margin-bottom:7px; overflow:hidden; transition:all 0.2s; background:#fafafa; }
   .task.done { background:#f5fce8; border-color:#b8e078; }
   .task-top { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; cursor:pointer; }
   .task-top:hover { background:rgba(0,0,0,0.02); }
-
   .cb { width:22px; height:22px; border-radius:5px; border:2px solid #ddd; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; cursor:pointer; transition:all 0.15s; font-size:13px; font-weight:800; color:#fff; user-select:none; }
-
   .task-right { flex:1; }
   .task-label { font-size:13px; font-weight:600; color:#333; line-height:1.4; transition:all 0.2s; }
   .task.done .task-label { color:#888; text-decoration:line-through; }
@@ -73,24 +60,21 @@
   .expand-chevron { font-size:10px; color:#ccc; margin-top:4px; flex-shrink:0; transition:transform 0.2s; }
   .expand-chevron.open { transform:rotate(180deg); }
 
-  /* Notify bar */
   .notify-bar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:10px 0 8px; padding:10px 12px; border-radius:8px; border:1px dashed #ddd; background:#f9f9f9; }
   .notify-bar.final { background:#fffbe6; border-color:#f0c040; }
   .notify-text { font-size:12px; color:#555; flex:1; min-width:140px; }
   .notify-btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:6px; font-size:12px; font-weight:700; text-decoration:none; border:none; cursor:pointer; transition:opacity 0.15s; }
-  .notify-btn:hover { opacity:0.85; text-decoration:none; }
+  .notify-btn:hover { opacity:0.85; }
   .btn-slack { background:#4A154B; color:#fff; }
   .btn-email { background:#0066cc; color:#fff; }
-  .btn-sent  { background:#76B900; color:#fff; }
+  .btn-sent { background:#76B900; color:#fff; }
 
-  /* Toast */
   #toastWrap { position:fixed; top:16px; right:16px; width:300px; z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
   .toast { background:#1e2124; border-left:3px solid #76B900; border-radius:8px; padding:12px 14px; font-size:12px; box-shadow:0 4px 20px rgba(0,0,0,0.25); animation:toastIn 0.3s ease; }
   .toast-from { color:#76B900; font-weight:700; margin-bottom:3px; }
-  .toast-msg  { color:#ccc; line-height:1.4; }
+  .toast-msg { color:#ccc; line-height:1.4; }
   @keyframes toastIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
 
-  /* Footer */
   .footer { margin-top:20px; padding:14px 18px; background:#fff; border-radius:10px; border:1px solid #e8e8e8; font-size:11px; color:#888; line-height:1.6; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
   .footer strong { color:#555; }
 </style>
@@ -99,14 +83,12 @@
 <div id="toastWrap"></div>
 <div class="app">
 
-  <!-- Header -->
   <div class="header">
     <div class="header-eyebrow">SCM Team · NVIDIA</div>
     <div class="header-title">New Hire Onboarding Journey</div>
     <div class="header-sub">Work through each section in order · Check off tasks as you complete them · Notify your manager at each milestone</div>
   </div>
 
-  <!-- Config -->
   <div class="config">
     <div class="config-group">
       <label>Your name:</label>
@@ -114,12 +96,11 @@
     </div>
     <div class="config-group">
       <label>Manager Slack ID:</label>
-      <input type="text" id="managerInput" placeholder="Your manager's Slack member ID" value="YOUR-MANAGER-SLACK-ID">
+      <input type="text" id="managerInput" placeholder="e.g. U08ABC1234" value="U09MQ3ER1FF">
     </div>
-    <span class="config-hint">💬 Click the toast or Notify button to open the Slack Workflow</span>
+    <span class="config-hint">💬 Slack notification fires on every task and section</span>
   </div>
 
-  <!-- Progress -->
   <div class="progress-card">
     <div class="progress-meta">
       <span>Overall Progress</span>
@@ -130,60 +111,60 @@
     <div class="complete-banner" id="completeBanner">🎉 Onboarding complete! Welcome to the SCM team.</div>
   </div>
 
-  <!-- Sections -->
   <div id="sections"></div>
 
   <div class="footer">
-    💡 <strong>For managers:</strong> Each new hire should have their own copy of this page. Suggested check-ins: after Access Requests (Day 2) · after Training Topics (Week 2) · after first solo hotseat shift (Week 4+).<br>
-    🔗 <strong>To embed in Confluence:</strong> Insert → Widget Connector → paste this page's URL. Full interactivity works inside the iframe.
+    💡 <strong>For managers:</strong> Each new hire should have their own copy of this page. Suggested check-ins: after Access Requests (Day 2) · after Training Topics (Week 2) · after first solo hotseat shift (Week 4+).
   </div>
 </div>
 
 <script>
+const WORKER = 'https://scm-onboarding-notifier.pnumeh.workers.dev';
+
 const SECTIONS = [
   { id:"access", title:"Access Requests", emoji:"🔐", color:"#5a9e00", bg:"#f5faea", border:"#c8e6a0",
     goal:"Get all system access sorted on Day 1–2. Your manager can sponsor any requests that need approval.",
     tasks:[
-      { id:"p4",      label:"Request Perforce access",       detail:"Submit via NVBugs or ITHelp for your P4 user account. Your manager can sponsor if needed.",                       link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Getting Started Guide" },
-      { id:"gerrit",  label:"Request Gerrit / Git access",   detail:"Request access to Gerrit and GitLab-master via your manager or the SCM Access Lists page.",                       link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Access Lists" },
-      { id:"gitlab",  label:"Request GitLab access",         detail:"Get added to the hwinf-scm GitLab group by your manager or squad lead.",                                          link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Getting Started Guide" },
-      { id:"slackch", label:"Join SCM Slack channels",       detail:"Join #hwinf-scm-tm (internal), #hwinf-scm-support (official support only), #hwinf-scm-gitlab, #hwinf-scm-gitrepnv2.", link:"https://slack.com", linkText:"#hwinf-scm-tm" },
-      { id:"dl",      label:"Join SCM distribution lists",   detail:"Ask your manager to add you to the relevant email DL groups for team comms and incident notifications.",            link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Getting Started Guide" },
+      { id:"p4",      label:"Request Perforce access",       detail:"Submit via NVBugs or ITHelp for your P4 user account. Your manager can sponsor if needed.",                       link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Getting Started Guide" },
+      { id:"gerrit",  label:"Request Gerrit / Git access",   detail:"Request access to Gerrit and GitLab-master via your manager or the SCM Access Lists page.",                       link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"SCM Access Lists" },
+      { id:"gitlab",  label:"Request GitLab access",         detail:"Get added to the hwinf-scm GitLab group by your manager or squad lead.",                                          link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Getting Started Guide" },
+      { id:"slackch", label:"Join SCM Slack channels",       detail:"Join #hwinf-scm-tm (internal), #hwinf-scm-support (official support only), #hwinf-scm-gitlab, #hwinf-scm-gitrepnv2.", link:"https://nvidia.slack.com/archives/C7527SP1V", linkText:"#hwinf-scm-tm" },
+      { id:"dl",      label:"Join SCM distribution lists",   detail:"Ask your manager to add you to the relevant email DL groups.",                                                     link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Getting Started Guide" },
     ]
   },
   { id:"docs", title:"Read Key Docs & Runbooks", emoji:"📖", color:"#0066bb", bg:"#eaf2ff", border:"#b3d1f5",
-    goal:"Read these before your first hotseat shadow. The Getting Started Guide and SUPER INDEX are the two most important.",
+    goal:"Read these before your first hotseat shadow. The Getting Started Guide and SUPER INDEX are the most important.",
     tasks:[
-      { id:"gs",    label:"Read SCM New Hire Getting Started Guide", detail:"Primary onboarding guide — read this first. Covers tools, access, processes, and team structure end to end.", link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Open Guide" },
-      { id:"si",    label:"Browse the SUPER INDEX",                  detail:"Your map for the full SCM documentation space. Spend 15 min browsing so you know where to find things.",       link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SUPER INDEX" },
-      { id:"hwinf", label:"Read HWInf New Hire Onboarding",          detail:"Broader HW Infrastructure onboarding context.",                                                                link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"HWInf Onboarding" },
-      { id:"hs",    label:"Read HotSeat How-To",                     detail:"Understand the follow-the-sun rotation model, triage process, SLOs, and handoff notes before you shadow.",    link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"HotSeat How-To" },
-      { id:"uh",    label:"Review SCM User Home",                    detail:"User-facing docs for Perforce, Git, and GitLab — know what your users see.",                                   link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM User Home" },
+      { id:"gs",    label:"Read SCM New Hire Getting Started Guide", detail:"Primary onboarding guide — read this first.",                                                             link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Open Guide" },
+      { id:"si",    label:"Browse the SUPER INDEX",                  detail:"Your map for the full SCM documentation space.",                                                          link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617054440", linkText:"SUPER INDEX" },
+      { id:"hwinf", label:"Read HWInf New Hire Onboarding",          detail:"Broader HW Infrastructure onboarding context.",                                                           link:"https://nvidia.atlassian.net/wiki/pages/viewpage.action?pageId=2346552110", linkText:"HWInf Onboarding" },
+      { id:"hs",    label:"Read HotSeat How-To",                     detail:"Understand the follow-the-sun rotation model before you shadow a shift.",                                 link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617051274", linkText:"HotSeat How-To" },
+      { id:"uh",    label:"Review SCM User Home",                    detail:"User-facing docs for Perforce, Git, and GitLab.",                                                         link:"https://confluence.nvidia.com/display/SCMU", linkText:"SCM User Home" },
     ]
   },
   { id:"training", title:"Training Topics", emoji:"🎓", color:"#d45500", bg:"#fff5ee", border:"#f5c090",
     goal:"Work through training with your assigned buddy. Typical target: end of Week 2.",
     tasks:[
-      { id:"scmt", label:"Complete SCM New Hire Training Topics", detail:"General ramp-up covering tools, processes, and architecture. Work through in order with your buddy.", link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Training Topics" },
-      { id:"gitt", label:"Complete Git Training Plan",            detail:"Git/Gerrit/GitLab training covering code review workflow, branching model, and GitLab CI basics.",   link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Git Training Plan" },
-      { id:"p4t",  label:"Complete Perforce Training Topics",     detail:"p4 commands, depot structure, changelists, streams, and large-file workflows at NVIDIA scale.",       link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"Perforce Training" },
+      { id:"scmt", label:"Complete SCM New Hire Training Topics", detail:"General ramp-up covering tools, processes, and architecture.", link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Training Topics" },
+      { id:"gitt", label:"Complete Git Training Plan",            detail:"Git/Gerrit/GitLab training covering code review workflow and branching model.", link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Git Training Plan" },
+      { id:"p4t",  label:"Complete Perforce Training Topics",     detail:"p4 commands, depot structure, changelists, and large-file workflows.", link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Perforce Training" },
     ]
   },
   { id:"team", title:"Meet the Team", emoji:"👋", color:"#6644cc", bg:"#f5f0ff", border:"#c5b8f0",
-    goal:"Getting connected early makes everything easier. Don't wait until you feel ready — introduce yourself in Week 1.",
+    goal:"Getting connected early makes everything easier. Introduce yourself in Week 1.",
     tasks:[
-      { id:"sq",    label:"Review SCM Squads page",               detail:"Understand squad structure, ownership areas, and who to contact for what.",                           link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Squads" },
-      { id:"one1",  label:"1:1 intro with your manager",          detail:"Schedule within Week 1. Agenda: 30/60/90 day expectations, squad assignment, buddy intro, open Qs.",  link:null },
-      { id:"intro", label:"Introduce yourself in #hwinf-scm-tm",  detail:"Post a brief intro — where you're based, background, and what you're excited to work on.",            link:"https://slack.com", linkText:"#hwinf-scm-tm" },
-      { id:"sync",  label:"Attend Weekly Documentation Sync",     detail:"Ask your manager for the recurring Teams calendar invite.",                                            link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Homepage" },
+      { id:"sq",    label:"Review SCM Squads page",               detail:"Understand squad structure and who to contact for what.",                            link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617092901", linkText:"SCM Squads" },
+      { id:"one1",  label:"1:1 intro with your manager",          detail:"Schedule within Week 1 — align on 30/60/90 day expectations.",                      link:null },
+      { id:"intro", label:"Introduce yourself in #hwinf-scm-tm",  detail:"Post a brief intro — where you're based, background, and what you're excited to work on.", link:"https://nvidia.slack.com/archives/C7527SP1V", linkText:"#hwinf-scm-tm" },
+      { id:"sync",  label:"Attend Weekly Documentation Sync",     detail:"Ask your manager for the recurring Teams calendar invite.",                          link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Homepage" },
     ]
   },
   { id:"hotseat", title:"Hotseat Shadowing", emoji:"🔥", color:"#cc2200", bg:"#fff0ee", border:"#f5b8b0",
-    goal:"Only start this section after completing Sections 1–4. You need system access and must have read the HotSeat How-To first.",
+    goal:"Only start after completing Sections 1–4. You need system access and must have read the HotSeat How-To first.",
     tasks:[
-      { id:"sh1",  label:"Shadow hotseat engineer — Day 1",    detail:"Observe a full shift: triage patterns, tooling used, SLO tracking, and how handoff notes are written.",    link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"HotSeat How-To" },
-      { id:"sh2",  label:"Shadow hotseat engineer — Day 2",    detail:"More active role: triage 2+ tickets, handle 1 through to resolution, write the end-of-shift handoff.",     link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"HotSeat How-To" },
-      { id:"solo", label:"Complete first solo hotseat shift",   detail:"Run independently with manager/buddy on Slack for escalations. Debrief with manager after the shift.",     link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"HotSeat Runbook" },
+      { id:"sh1",  label:"Shadow hotseat engineer — Day 1",    detail:"Observe a full shift — triage patterns, tooling, SLO tracking, handoff notes.", link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617051274", linkText:"HotSeat How-To" },
+      { id:"sh2",  label:"Shadow hotseat engineer — Day 2",    detail:"More active role — triage 2+ tickets, handle 1 through to resolution.",         link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617051274", linkText:"HotSeat How-To" },
+      { id:"solo", label:"Complete first solo hotseat shift",   detail:"Run independently with manager/buddy on Slack for escalations.",                link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617051311", linkText:"HotSeat Runbook" },
     ]
   }
 ];
@@ -194,40 +175,34 @@ const detailOpen = {};
 const sectionOpen = {};
 SECTIONS.forEach(s => { sectionOpen[s.id] = true; });
 
-const getName    = () => document.getElementById('nameInput').value.trim()   || 'New Hire';
-const getManager = () => document.getElementById('managerInput').value.trim() || 'YOUR-MANAGER-SLACK-ID';
+const getName    = () => document.getElementById('nameInput').value.trim()    || 'New Hire';
 const getCompleted = () => Object.values(checked).filter(Boolean).length;
 
-// Toast + Slack deep link
-function showToast(taskLabel, sectionTitle) {
+function postToSlack(text) {
+  fetch(WORKER, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  }).catch(() => {});
+}
+
+function showToast(msg, section) {
   const done = getCompleted();
   const pct  = Math.round(done / TOTAL * 100);
   const wrap = document.getElementById('toastWrap');
   const el   = document.createElement('div');
   el.className = 'toast';
-  el.innerHTML = `<div class="toast-from">💬 Slack → ${getManager()}</div>
-    <div class="toast-msg">✅ <strong>${getName()}</strong> completed<br>"${taskLabel}"<br>${sectionTitle} · ${done}/${TOTAL} (${pct}%)<br><a href="#" onclick="openSlackDM('${taskLabel}','${sectionTitle}',${done},${pct});return false;" style="color:#76B900;font-weight:700;">→ Open Slack Workflow</a></div>`;
+  el.innerHTML = `<div class="toast-from">💬 Slack notification sent</div>
+    <div class="toast-msg">${msg}<br><small>${section} · ${done}/${TOTAL} (${pct}%)</small></div>`;
   wrap.appendChild(el);
   setTimeout(() => {
     el.style.transition = 'opacity 0.4s';
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 400);
-  }, 8000);
+  }, 4500);
 }
 
-function openSlackDM(taskLabel, sectionTitle, done, pct) {
-  const managerId = getManager();
-  const name      = getName();
-  // Slack deep link — opens DM to the manager with pre-filled message
-  // The slack:// protocol opens the desktop app directly to the DM thread
-  const msg = encodeURIComponent(
-    `✅ ${name} completed "${taskLabel}" (${sectionTitle}) — ${done}/${TOTAL} tasks (${pct}% overall)`
-  );
-  // Open Slack Workflow
-  window.open('https://slack.com/shortcuts/Ft0B88R2RV44/9370c466951d616241fb50e9e92d782a', '_blank');
-}
-
-// Progress
 function updateProgress() {
   const done = getCompleted();
   const pct  = Math.round(done / TOTAL * 100);
@@ -235,8 +210,9 @@ function updateProgress() {
   document.getElementById('progressFill').style.background = pct === 100 ? '#76B900' : 'linear-gradient(90deg,#76B900,#a3e635)';
   document.getElementById('progressLabel').textContent = `${done} / ${TOTAL} tasks (${pct}%)`;
   document.getElementById('completeBanner').style.display = pct === 100 ? 'block' : 'none';
-
-  // Section dots
+  if (pct === 100) {
+    postToSlack(`🎉 *${getName()}* completed the full SCM Onboarding Journey! All 20 tasks done.`);
+  }
   SECTIONS.forEach(s => {
     const dot  = document.getElementById('dot-' + s.id);
     const done = s.tasks.filter(t => checked[t.id]).length;
@@ -244,7 +220,6 @@ function updateProgress() {
   });
 }
 
-// Toggle task
 function toggleTask(taskId, sectionId) {
   checked[taskId] = !checked[taskId];
   const section = SECTIONS.find(s => s.id === sectionId);
@@ -257,17 +232,11 @@ function toggleTask(taskId, sectionId) {
     cbEl.style.background  = section.color;
     cbEl.style.borderColor = section.color;
     cbEl.textContent = '✓';
-    showToast(task.label, section.title);
-    // Silent background Slack ping on each task
-    const done2 = getCompleted();
-    const pct2  = Math.round(done2 / TOTAL * 100);
-    fetch('https://scm-onboarding-notifier.pnumeh.workers.dev', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'payload=' + encodeURIComponent(JSON.stringify({
-        text: `☑️ *${getName()}* checked off "${task.label}" (${section.title}) — ${done2}/${TOTAL} tasks (${pct2}%)`
-      }))
-    }).catch(() => {});
+    const done = getCompleted();
+    const pct  = Math.round(done / TOTAL * 100);
+    const msg  = `☑️ *${getName()}* checked off "${task.label}" (${section.title}) — ${done}/${TOTAL} tasks (${pct}%)`;
+    postToSlack(msg);
+    showToast(`Checked: ${task.label}`, section.title);
   } else {
     taskEl.classList.remove('done');
     cbEl.style.background  = '#fff';
@@ -278,25 +247,20 @@ function toggleTask(taskId, sectionId) {
   updateSectionUI(sectionId);
 }
 
-// Toggle detail
 function toggleDetail(taskId) {
   detailOpen[taskId] = !detailOpen[taskId];
-  const det  = document.getElementById('det-' + taskId);
+  const det  = document.getElementById('det-'  + taskId);
   const chev = document.getElementById('chev-' + taskId);
   det.classList.toggle('open', detailOpen[taskId]);
   if (chev) chev.className = 'expand-chevron' + (detailOpen[taskId] ? ' open' : '');
 }
 
-// Toggle section
 function toggleSection(sectionId) {
   sectionOpen[sectionId] = !sectionOpen[sectionId];
-  const body = document.getElementById('sbody-' + sectionId);
-  const chev = document.getElementById('schev-' + sectionId);
-  body.style.display = sectionOpen[sectionId] ? 'block' : 'none';
-  if (chev) chev.className = 'section-chevron' + (sectionOpen[sectionId] ? ' open' : '');
+  document.getElementById('sbody-'  + sectionId).style.display = sectionOpen[sectionId] ? 'block' : 'none';
+  document.getElementById('schev-' + sectionId).className = 'section-chevron' + (sectionOpen[sectionId] ? ' open' : '');
 }
 
-// Section UI
 function updateSectionUI(sectionId) {
   const section = SECTIONS.find(s => s.id === sectionId);
   const done    = section.tasks.filter(t => checked[t.id]).length;
@@ -306,57 +270,61 @@ function updateSectionUI(sectionId) {
   const badge   = document.getElementById('sbadge-' + sectionId);
   const count   = document.getElementById('scount-' + sectionId);
   const name    = document.getElementById('sname-'  + sectionId);
-
   count.textContent = `${done}/${section.tasks.length}`;
   if (allDone) {
     wrap.classList.add('all-done');
-    wrap.style.borderColor   = section.color;
-    hdr.style.background     = section.bg;
-    name.style.color         = section.color;
-    count.style.background   = section.color;
-    count.style.color        = '#fff';
-    badge.style.display      = 'inline';
-    badge.style.background   = section.color;
+    wrap.style.borderColor = section.color;
+    hdr.style.background   = section.bg;
+    name.style.color       = section.color;
+    count.style.background = section.color;
+    count.style.color      = '#fff';
+    badge.style.display    = 'inline';
+    badge.style.background = section.color;
   } else {
     wrap.classList.remove('all-done');
-    wrap.style.borderColor   = '#e8e8e8';
-    hdr.style.background     = '';
-    name.style.color         = '#222';
-    count.style.background   = section.border;
-    count.style.color        = section.color;
-    badge.style.display      = 'none';
+    wrap.style.borderColor = '#e8e8e8';
+    hdr.style.background   = '';
+    name.style.color       = '#222';
+    count.style.background = section.border;
+    count.style.color      = section.color;
+    badge.style.display    = 'none';
   }
 }
 
-// Notify button
 function sendNotify(sectionId) {
-  const section    = SECTIONS.find(s => s.id === sectionId);
-  const doneTasks  = section.tasks.filter(t => checked[t.id]).length;
-  const btn        = document.getElementById('nbtn-' + sectionId);
-  const managerId  = getManager();
-  const name       = getName();
-  const totalDone  = getCompleted();
-  const pct        = Math.round(totalDone / TOTAL * 100);
+  const section   = SECTIONS.find(s => s.id === sectionId);
+  const doneTasks = section.tasks.filter(t => checked[t.id]).length;
+  const btn       = document.getElementById('nbtn-' + sectionId);
+  const name      = getName();
+  const totalDone = getCompleted();
+  const pct       = Math.round(totalDone / TOTAL * 100);
+  const isLast    = sectionId === 'hotseat';
+  const taskLines = section.tasks.map(t => (checked[t.id] ? '✅' : '☐') + ' ' + t.label).join('\n');
+  const text = (isLast ? '🎉' : '✅') + ` *SCM Onboarding Update*\n*New hire:* ${name}\n*Section:* ${section.title} (${doneTasks}/${section.tasks.length} tasks)\n\n${taskLines}\n\n*Overall:* ${totalDone}/${TOTAL} (${pct}%)${isLast ? '\n\n🎉 *Onboarding complete! Welcome to the SCM team.*' : ''}`;
 
-  const msgLines = section.tasks.map(t => (checked[t.id] ? '✅' : '☐') + ' ' + t.label).join('%0A');
-  const msgText  = `✅ ${name} completed section: *${section.title}* (${doneTasks}/${section.tasks.length} tasks)%0A%0A${msgLines}%0A%0AOverall progress: ${totalDone}/${TOTAL} (${pct}%)`;
+  if (btn) { btn.textContent = '⏳ Sending...'; btn.className = 'notify-btn btn-sent'; }
 
-  // Open Slack Workflow
-  window.open('https://slack.com/shortcuts/Ft0B88R2RV44/9370c466951d616241fb50e9e92d782a', '_blank');
-
-  if (btn) {
-    btn.textContent = '✅ Opened!';
-    btn.className   = 'notify-btn btn-sent';
-    setTimeout(() => {
-      btn.textContent = '💬 Slack';
-      btn.className   = 'notify-btn btn-slack';
-    }, 3000);
-  }
+  fetch(WORKER, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (btn) {
+      btn.textContent = data.ok ? '✅ Sent!' : '⚠️ Try again';
+      btn.className   = 'notify-btn btn-sent';
+      setTimeout(() => { btn.textContent = '💬 Slack'; btn.className = 'notify-btn btn-slack'; }, 4000);
+    }
+    if (data.ok) showToast('Manager notified!', section.title);
+  })
+  .catch(() => {
+    if (btn) { btn.textContent = '💬 Slack'; btn.className = 'notify-btn btn-slack'; }
+  });
 }
 
-// Render
 function render() {
-  // Section dots
   const dotsWrap = document.getElementById('sectionDots');
   SECTIONS.forEach(s => {
     const dot = document.createElement('span');
@@ -372,9 +340,9 @@ function render() {
     const emailBody = encodeURIComponent(
       `Hi,\n\nI completed "${s.title}" in the SCM Onboarding Journey.\n\n` +
       s.tasks.map(t => `✅ ${t.label}`).join('\n') +
-      `\n\nOverall: ${isLast ? 'All sections complete! 🎉' : 'Moving on to the next section.'}\n\nThanks, ${getName()}`
+      `\n\nOverall: ${isLast ? 'All sections complete! 🎉' : 'Moving to the next section.'}\n\nThanks, ${getName()}`
     );
-    const emailSub = encodeURIComponent(`Onboarding${isLast ? ' Complete 🎉' : ' Update'}: ${s.title}${isLast ? ' Done' : ' Complete'}`);
+    const emailSub = encodeURIComponent(`Onboarding${isLast ? ' Complete 🎉' : ' Update'}: ${s.title}`);
 
     const taskHTML = s.tasks.map(t => `
       <div class="task" id="task-${t.id}">
@@ -391,10 +359,6 @@ function render() {
         </div>
       </div>`).join('');
 
-    const notifyLabel = isLast
-      ? '🎉 <strong>Onboarding complete!</strong> Notify your manager:'
-      : '✅ <strong>Section done?</strong> Notify your manager:';
-
     const div = document.createElement('div');
     div.className = 'section';
     div.id = 'swrap-' + s.id;
@@ -410,7 +374,7 @@ function render() {
         <div class="goal-panel" style="border-left-color:${s.color}">${s.goal}</div>
         ${taskHTML}
         <div class="notify-bar ${isLast ? 'final' : ''}">
-          <span class="notify-text">${notifyLabel}</span>
+          <span class="notify-text">${isLast ? '🎉 <strong>Onboarding complete!</strong>' : '✅ <strong>Section done?</strong>'} Notify your manager:</span>
           <button class="notify-btn btn-slack" id="nbtn-${s.id}" onclick="sendNotify('${s.id}')">💬 Slack</button>
           <a class="notify-btn btn-email" href="mailto:?subject=${emailSub}&body=${emailBody}">✉️ Email</a>
         </div>
