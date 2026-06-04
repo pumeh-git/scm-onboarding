@@ -132,6 +132,15 @@ const SECTIONS = [
       { id:"dl",      label:"Join SCM distribution lists",   detail:"Ask your manager to add you to the relevant email DL groups.",                                                     link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Getting Started Guide" },
     ]
   },
+  { id:"team", title:"Meet the Team", emoji:"👋", color:"#6644cc", bg:"#f5f0ff", border:"#c5b8f0",
+    goal:"Getting connected early makes everything easier. Introduce yourself in Week 1.",
+    tasks:[
+      { id:"sq",    label:"Review SCM Squads page",               detail:"Understand squad structure and who to contact for what.",                            link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617092901", linkText:"SCM Squads" },
+      { id:"one1",  label:"1:1 intro with your manager",          detail:"Schedule within Week 1 — align on 30/60/90 day expectations.",                      link:null },
+      { id:"intro", label:"Introduce yourself in #hwinf-scm-tm",  detail:"Post a brief intro — where you're based, background, and what you're excited to work on.", link:"https://nvidia.slack.com/archives/C7527SP1V", linkText:"#hwinf-scm-tm" },
+      { id:"sync",  label:"Attend Weekly Documentation Sync",     detail:"Ask your manager for the recurring Teams calendar invite.",                          link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Homepage" },
+    ]
+  },
   { id:"docs", title:"Read Key Docs & Runbooks", emoji:"📖", color:"#0066bb", bg:"#eaf2ff", border:"#b3d1f5",
     goal:"Read these before your first hotseat shadow. The Getting Started Guide and SUPER INDEX are the most important.",
     tasks:[
@@ -150,15 +159,6 @@ const SECTIONS = [
       { id:"p4t",  label:"Complete Perforce Training Topics",     detail:"p4 commands, depot structure, changelists, and large-file workflows.", link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617060755", linkText:"Perforce Training" },
     ]
   },
-  { id:"team", title:"Meet the Team", emoji:"👋", color:"#6644cc", bg:"#f5f0ff", border:"#c5b8f0",
-    goal:"Getting connected early makes everything easier. Introduce yourself in Week 1.",
-    tasks:[
-      { id:"sq",    label:"Review SCM Squads page",               detail:"Understand squad structure and who to contact for what.",                            link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617092901", linkText:"SCM Squads" },
-      { id:"one1",  label:"1:1 intro with your manager",          detail:"Schedule within Week 1 — align on 30/60/90 day expectations.",                      link:null },
-      { id:"intro", label:"Introduce yourself in #hwinf-scm-tm",  detail:"Post a brief intro — where you're based, background, and what you're excited to work on.", link:"https://nvidia.slack.com/archives/C7527SP1V", linkText:"#hwinf-scm-tm" },
-      { id:"sync",  label:"Attend Weekly Documentation Sync",     detail:"Ask your manager for the recurring Teams calendar invite.",                          link:"https://nvidia.atlassian.net/wiki/spaces/ST", linkText:"SCM Homepage" },
-    ]
-  },
   { id:"hotseat", title:"Hotseat Shadowing", emoji:"🔥", color:"#cc2200", bg:"#fff0ee", border:"#f5b8b0",
     goal:"Only start after completing Sections 1–4. You need system access and must have read the HotSeat How-To first.",
     tasks:[
@@ -167,6 +167,7 @@ const SECTIONS = [
       { id:"solo", label:"Complete first solo hotseat shift",   detail:"Run independently with manager/buddy on Slack for escalations.",                link:"https://nvidia.atlassian.net/wiki/spaces/ST/pages/2617051311", linkText:"HotSeat Runbook" },
     ]
   }
+];
 ];
 
 const TOTAL = SECTIONS.reduce((a,s) => a+s.tasks.length, 0);
